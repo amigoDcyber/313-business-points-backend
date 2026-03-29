@@ -1,0 +1,20 @@
+CREATE TABLE transfers (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id),
+    quote_id UUID REFERENCES quotes(id),
+    recipient_id UUID NOT NULL REFERENCES recipients(id),
+    corridor_id UUID NOT NULL REFERENCES corridors(id),
+    amount_sent DECIMAL(15, 2) NOT NULL,
+    amount_received DECIMAL(15, 2) NOT NULL,
+    fee DECIMAL(15, 2) NOT NULL,
+    total_paid DECIMAL(15, 2) NOT NULL,
+    send_currency VARCHAR(10) NOT NULL,
+    receive_currency VARCHAR(10) NOT NULL,
+    transfer_reason VARCHAR(255),
+    status VARCHAR(50) NOT NULL,
+    reference_code VARCHAR(100) UNIQUE NOT NULL,
+    receipt_url VARCHAR(500),
+    completed_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

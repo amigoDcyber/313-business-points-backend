@@ -1,0 +1,8 @@
+CREATE TABLE transfer_status_logs (
+    id UUID PRIMARY KEY,
+    transfer_id UUID NOT NULL REFERENCES transfers(id) ON DELETE CASCADE,
+    status VARCHAR(50) NOT NULL,
+    note TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

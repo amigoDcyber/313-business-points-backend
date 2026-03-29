@@ -1,0 +1,9 @@
+CREATE TABLE referrals (
+    id UUID PRIMARY KEY,
+    referrer_id UUID NOT NULL REFERENCES users(id),
+    referred_id UUID NOT NULL REFERENCES users(id),
+    status VARCHAR(50) NOT NULL,
+    reward_amount DECIMAL(15, 2) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
