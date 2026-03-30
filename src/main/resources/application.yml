@@ -10,9 +10,9 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/remit313
-    username: apple
-    password: backend
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/remit313}
+    username: ${DB_USER:apple}
+    password: ${DB_PASS:backend}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -29,13 +29,14 @@ spring:
     password: ${spring.datasource.password}
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASS:}
   mail:
-    host: smtp.mailtrap.io
-    port: 2525
-    username: test
-    password: password
+    host: ${MAIL_HOST:smtp.mailtrap.io}
+    port: ${MAIL_PORT:2525}
+    username: ${MAIL_USER:test}
+    password: ${MAIL_PASS:password}
     properties:
       mail:
         smtp:
@@ -46,11 +47,11 @@ spring:
 app:
   security:
     jwt:
-      secret: 4b676f62594a5043586c554b736b7537535451614741706c6467385a49444f6f437032766f75666f77343d
-      expiration: 900000 # 15 minutes in ms
-      refresh-expiration: 604800000 # 7 days in ms
+      secret: ${JWT_SECRET:4b676f62594a5043586c554b736b7537535451614741706c6467385a49444f6f437032766f75666f77343d}
+      expiration: ${JWT_EXPIRATION_MS:900000} # 15 minutes in ms
+      refresh-expiration: ${JWT_REFRESH_EXPIRATION_MS:604800000} # 7 days in ms
   cors:
-    allowed-origins: "http://localhost:3000,http://localhost:5173"
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:"http://localhost:3000,http://localhost:5173"}
 
 ---
 spring:
