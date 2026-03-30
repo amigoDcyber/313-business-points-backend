@@ -13,6 +13,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.businesspoint.backend.auth.security.CustomUserDetails;
+import com.businesspoint.backend.users.dto.UserResponse;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -31,9 +34,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        System.out.println("DEBUG: Incoming login request for email: " + request.getEmail());
         AuthResponse authResponse = authService.authenticate(request);
         setTokenCookie(response, authResponse.getAccessToken());
         return ResponseEntity.ok(ApiResponse.success(authResponse));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success(authService.getUserResponse(userDetails.getUser().getId())));
     }
 
     @PostMapping("/logout")

@@ -68,6 +68,13 @@ public class AuthService {
         return buildAuthResponse(user, requiresOtp);
     }
 
+    @Transactional(readOnly = true)
+    public UserResponse getUserResponse(java.util.UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("User not found"));
+        return userMapper.toResponse(user);
+    }
+
     private boolean checkDeviceTrust(User user, String deviceId) {
         if (deviceId == null) return true; // Force OTP if no device ID is provided
 

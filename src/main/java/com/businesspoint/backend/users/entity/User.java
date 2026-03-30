@@ -38,4 +38,12 @@ public class User extends BaseEntity {
 
     @Column(name = "language")
     private String language;
+
+    @Builder.Default
+    @Column(nullable = false, precision = 15, scale = 2)
+    private java.math.BigDecimal balance = new java.math.BigDecimal("1250.00");
+
+    @Builder.Default
+    @Column(nullable = false, length = 10)
+    private String currency = "RWF";
 }

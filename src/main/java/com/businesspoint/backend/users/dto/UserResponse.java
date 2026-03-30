@@ -16,6 +16,8 @@ public class UserResponse {
     private Role status;
     private String referralCode;
     private String language;
+    private java.math.BigDecimal balance;
+    private String currency;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

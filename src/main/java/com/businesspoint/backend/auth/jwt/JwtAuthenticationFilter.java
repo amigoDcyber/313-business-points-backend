@@ -38,24 +38,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (tokenBlacklistService.isBlacklisted(jwt)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
+        try {
+            if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (tokenBlacklistService.isBlacklisted(jwt)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
-            String userEmail = jwtService.extractUsername(jwt);
-            if (userEmail != null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                String userEmail = jwtService.extractUsername(jwt);
+                if (userEmail != null) {
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    if (jwtService.isTokenValid(jwt, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities()
+                        );
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
             }
+        } catch (Exception e) {
+            // Log error but continue filter chain - let Spring Security decide if access is allowed
+            System.err.println("JWT Filter Error: " + e.getMessage());
         }
         filterChain.doFilter(request, response);
     }

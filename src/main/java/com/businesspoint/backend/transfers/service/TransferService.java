@@ -55,6 +55,32 @@ public class TransferService {
         // Proceed to generate safe transfer reference code
         String referenceCode = "BPT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
+        // Deduct from Sender
+        java.math.BigDecimal totalCost = quote.getTotalPayable();
+        System.out.println("DEBUG: Deducting " + totalCost + " from " + user.getEmail() + ". Current: " + user.getBalance());
+        if (user.getBalance().compareTo(totalCost) < 0) {
+            throw new BusinessException("Insufficient balance. You need " + totalCost + " " + quote.getSendCurrency());
+        }
+        user.setBalance(user.getBalance().subtract(totalCost));
+        userRepository.save(user);
+        System.out.println("DEBUG: New Sender Balance: " + user.getBalance());
+
+        // Credit Recipient if internal user (Ultra-robust match: strip EVERYTHING except digits)
+        final String sanitizedTarget = recipient.getPhone().replaceAll("[^0-9]", "");
+        System.out.println("DEBUG: Aggressively searching for digits: " + sanitizedTarget);
+        
+        userRepository.findAll().stream()
+                .filter(u -> u.getPhone() != null && u.getPhone().replaceAll("[^0-9]", "").equals(sanitizedTarget))
+                .findFirst()
+                .ifPresentOrElse(targetUser -> {
+                    System.out.println("DEBUG: TARGET FOUND! Crediting " + quote.getAmountReceived() + " to " + targetUser.getEmail());
+                    targetUser.setBalance(targetUser.getBalance().add(quote.getAmountReceived()));
+                    userRepository.save(targetUser);
+                    System.out.println("DEBUG: New Recipient Balance: " + targetUser.getBalance());
+                }, () -> {
+                    System.out.println("DEBUG: NO TARGET USER MATCHED for sanitized phone: " + sanitizedTarget);
+                });
+
         Transfer transfer = Transfer.builder()
                 .user(user)
                 .quote(quote)
